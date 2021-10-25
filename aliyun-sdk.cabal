@@ -1,0 +1,166 @@
+name:                aliyun-sdk
+version:             0.1.0.0
+synopsis:            Call OpenAPI of Ali cloud service.
+-- description:
+homepage:            https://github.com/ruiheng/aliyun#readme
+license:             BSD3
+license-file:        LICENSE
+author:              Gilbert Fine
+maintainer:          gilbert.fine@gmail.com
+copyright:           2021 Gilbert Fine
+category:            Web
+build-type:          Simple
+extra-source-files:  README.md
+cabal-version:       >=1.10
+
+Flag dev
+    Description:   Turn on development settings, like disable optimization.
+    Default:       True
+
+Flag library-only
+    Description:   Build for library only
+    Default:       False
+
+library
+  hs-source-dirs:      src
+  exposed-modules:     AliYun
+                       AliYun.Types
+                       AliYun.Error
+
+  other-modules:       Import
+                       AliYun.OpenAPI.Basic
+                       AliYun.OpenAPI.ECS
+                       AliYun.OpenAPI.ECS.Instance
+                       AliYun.OpenAPI.ECS.Region
+                       AliYun.OpenAPI.DNS
+                       AliYun.Helpers
+
+  build-depends:       base >= 4.7 && < 5
+                     , classy-prelude
+                     , monad-control
+                     , time
+                     , aeson
+                     , aeson-pretty
+                     , aeson-lens
+                     , base64
+                     , http-types
+                     , binary
+                     , wreq
+                     , lens
+                     , cryptonite
+                     , persistent
+                     , blaze-html
+                     , monad-logger
+                     , bytestring
+                     , text
+                     , shakespeare
+                     , random
+                     , memory
+                     , transformers
+                     , mtl
+                     , xml-conduit
+                     , extra
+                     , wai-extra
+
+  default-language:    Haskell2010
+
+  default-extensions: TemplateHaskell
+                      QuasiQuotes
+                      OverloadedStrings
+                      NoImplicitPrelude
+                      CPP
+                      MultiParamTypeClasses
+                      TypeFamilies
+                      GADTs
+                      GeneralizedNewtypeDeriving
+                      FlexibleContexts
+                      FlexibleInstances
+                      EmptyDataDecls
+                      NoMonomorphismRestriction
+                      DeriveDataTypeable
+                      ConstraintKinds
+                      DeriveGeneric
+                      RankNTypes
+                      FunctionalDependencies
+                      PartialTypeSignatures
+                      DataKinds
+                      TupleSections
+                      RecordWildCards
+                      TypeApplications
+
+  ghc-options:  -Wall -fwarn-tabs -fno-warn-partial-type-signatures -j
+
+  if flag(dev)
+      cpp-options:   -DDEVELOPMENT
+      -- ghc-options:   -O0 +RTS -A128m -n2m -RTS
+      -- haddock 目前不支付解释RTS选项，等haddock新版直接过滤掉RTS选项后就可以用以上选项
+      -- see: haddock issue #725
+  else
+      ghc-options:   -O
+
+
+executable aliyun-manage
+  if flag(library-only)
+      Buildable: False
+
+  main-is:             manage.hs
+  hs-source-dirs:      tools
+  build-depends:       classy-prelude
+                     , base
+                     , aliyun-sdk
+                     , optparse-applicative
+                     , monad-logger
+                     , fast-logger
+                     , http-client
+                     , wreq
+                     , lens
+                     , bytestring
+                     , transformers
+                     , monad-control
+                     , conduit
+                     , aeson
+                     , aeson-pretty
+                     , time
+                     , text
+                     , containers
+                     , yesod
+                     , unicode-show
+
+  default-language:    Haskell2010
+
+  default-extensions: TemplateHaskell
+                      QuasiQuotes
+                      OverloadedStrings
+                      NoImplicitPrelude
+                      CPP
+                      RecordWildCards
+                      FlexibleContexts
+
+test-suite aliyun-test
+  type:                exitcode-stdio-1.0
+  hs-source-dirs:      test
+  main-is:             Spec.hs
+  other-modules:       AliYun.OpenAPI.BasicSpec
+
+  build-depends:       base
+                     , classy-prelude
+                     , aliyun-sdk
+                     , hspec
+                     , QuickCheck
+                     , time
+                     , shakespeare
+                     , monad-logger
+
+  ghc-options:         -Wall -fwarn-tabs -fno-warn-partial-type-signatures -threaded -rtsopts -with-rtsopts=-N
+  default-language:    Haskell2010
+
+  default-extensions: NoImplicitPrelude
+                      OverloadedStrings
+                      ScopedTypeVariables
+                      TemplateHaskell
+                      QuasiQuotes
+                      CPP
+
+source-repository head
+  type:     git
+  location: https://github.com/ruiheng/aliyun-sdk
