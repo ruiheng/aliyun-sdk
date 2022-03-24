@@ -1,7 +1,6 @@
 {-# LANGUAGE CPP #-}
 {-# LANGUAGE DeriveFunctor #-}
 {-# LANGUAGE ScopedTypeVariables #-}
-{-# OPTIONS_GHC -pgmP cc -optP -E -optP -undef -optP -std=c89 #-}
 module AliYun.Types where
 
 -- {{{1 imports
@@ -29,33 +28,33 @@ import Control.Monad.Trans.Control
            , ParamValue \
            )
 
-#define NEWTYPE_DEF(t1, t2) newtype t1 = t1 { un ## t1 :: t2 }
+#define NEWTYPE_DEF(t1, un_t1, t2) newtype t1 = t1 { un_t1 :: t2 }
 
-#define NEWTYPE_DEF_TEXT(t1) NEWTYPE_DEF(t1, Text) NEWTYPE_TEXT_DERIVING
+#define NEWTYPE_DEF_TEXT(t1, un_t1) NEWTYPE_DEF(t1, un_t1, Text) NEWTYPE_TEXT_DERIVING
 
-#define INSTANCES_BY_SHOW_READ(t) \
-instance ParamValue t where { toParamValue = tshow . un ## t } ; \
-instance ToJSON t where { toJSON = toJSON . un ## t }; \
+#define INSTANCES_BY_SHOW_READ(t, un_t) \
+instance ParamValue t where { toParamValue = tshow . un_t } ; \
+instance ToJSON t where { toJSON = toJSON . un t }; \
 instance FromJSON t where { \
   parseJSON (A.String s) = maybe mzero (return . t) $ readMay s ;\
   parseJSON v = fmap t $ parseJSON v; \
                           }
 
-NEWTYPE_DEF_TEXT(AccessKeyId)
-NEWTYPE_DEF_TEXT(AccessKeySecret)
+NEWTYPE_DEF_TEXT(AccessKeyId, unAccessKeyId)
+NEWTYPE_DEF_TEXT(AccessKeySecret, unAccessKeySecret)
 
-NEWTYPE_DEF_TEXT(Nonce)
-NEWTYPE_DEF_TEXT(ApiVersion)
-NEWTYPE_DEF_TEXT(RequestId)
+NEWTYPE_DEF_TEXT(Nonce, unNonce)
+NEWTYPE_DEF_TEXT(ApiVersion, unApiVersion)
+NEWTYPE_DEF_TEXT(RequestId, unRequestId)
 
-NEWTYPE_DEF_TEXT(EcsInstanceId)
-NEWTYPE_DEF_TEXT(EcsRegionId)
-NEWTYPE_DEF_TEXT(ZoneId)
-NEWTYPE_DEF_TEXT(DnsRecordId)
+NEWTYPE_DEF_TEXT(EcsInstanceId, unEcsInstanceId)
+NEWTYPE_DEF_TEXT(EcsRegionId, unEcsRegionId)
+NEWTYPE_DEF_TEXT(ZoneId, unZoneId)
+NEWTYPE_DEF_TEXT(DnsRecordId, unDnsRecordId)
 
 
 -- | CAUTION: 未 url-encode 时的签名字串，即 base64 得到的字串
-NEWTYPE_DEF_TEXT(Signature)
+NEWTYPE_DEF_TEXT(Signature, unSignature)
 
 data ApiFormat = ApiJson
                | ApiXml
