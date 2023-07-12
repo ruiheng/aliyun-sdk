@@ -54,7 +54,7 @@ ecsDescribeInstanceStatus :: (HttpCallMonad env m)
                           -> NonEmpty EcsInstanceId
                           -> m ( Either ApiError' (RequestId, [RsDescribeInstanceStatus]) )
 ecsDescribeInstanceStatus url0 region_id inst_ids = do
-  openApiCallJsonGetPagedList url api_ver action params0 (Proxy @ "InstanceStatuses")
+  openApiCallJsonGetPagedList url api_ver action params0 (Proxy @"InstanceStatuses")
   where
     url = fromMaybe ecsDefaultApiUrl url0
     api_ver = ecsApiVersion

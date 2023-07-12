@@ -7,6 +7,7 @@ module AliYun.Types where
 import           Import
 import           Data.Aeson as A
 import qualified Data.Aeson.Types as A
+import qualified Data.Aeson.Key as AK
 import           Database.Persist.Sql  (PersistField (..), PersistFieldSql (..))
 import           Text.Blaze.Html       (ToMarkup (..))
 import           Text.Shakespeare.I18N (ToMessage (..))
@@ -142,14 +143,34 @@ instance HasWreqSession HttpCallEnv where
   getWreqSession = hceWreqSession
 
 
+#if MIN_VERSION_aeson(2, 0, 0)
+type AesonKey = Key
+#else
+type AesonKey = Text
+#endif
+
+aesonKeyToText :: AesonKey -> Text
+#if MIN_VERSION_aeson(2, 0, 0)
+aesonKeyToText = AK.toText
+#else
+aesonKeyToText = id
+#endif
+
+aesonKeyFromText :: Text -> AesonKey
+#if MIN_VERSION_aeson(2, 0, 0)
+aesonKeyFromText = AK.fromText
+#else
+aesonKeyFromText = id
+#endif
+
 
 class ExtraNestedJsonKey a where
   -- | JSON 报文中，额外嵌套的一层 Key
-  extraNestedJsonKey :: Proxy a -> Text
+  extraNestedJsonKey :: Proxy a -> AesonKey
 
 
 parseNestedInnerJson :: forall a. (ExtraNestedJsonKey a, FromJSON a) => A.Value -> A.Parser a
-parseNestedInnerJson = withObject (unpack k) (.: k)
+parseNestedInnerJson = withObject (unpack $ aesonKeyToText k) (.: k)
   where k = extraNestedJsonKey (Proxy @a)
 
 

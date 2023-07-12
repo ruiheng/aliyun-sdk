@@ -41,7 +41,6 @@ library
                      , time
                      , aeson
                      , aeson-pretty
-                     , aeson-lens
                      , base64
                      , http-types
                      , binary
